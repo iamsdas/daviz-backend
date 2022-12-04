@@ -12,10 +12,12 @@ class CsvUtils:
         data_type: DataType,
         csv_file: UploadFile,
         x_axis: str | None = None,
-        y_axes: list[str] | None = None,
+        y_axes: str | None = None,
     ):
         self.x_axis = x_axis
-        self.y_axes = y_axes
+        self.y_axes = (
+            [y_axis.strip() for y_axis in y_axes.split(",")] if y_axes else None
+        )
         self.data_type = data_type
         self.load_data(csv_file)
 
