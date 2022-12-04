@@ -6,7 +6,7 @@ from fastapi import HTTPException, UploadFile
 from utils.models import DataType
 
 
-class ParseUtils:
+class CsvUtils:
     def __init__(
         self,
         data_type: DataType,
@@ -17,6 +17,9 @@ class ParseUtils:
         self.x_axis = x_axis
         self.y_axes = y_axes
         self.data_type = data_type
+        self.load_data(csv_file)
+
+    def load_data(self, csv_file: UploadFile):
         self.df = read_csv(
             StringIO(str(csv_file.file.read(), "utf-8")), encoding="utf-8"
         )
@@ -25,7 +28,42 @@ class ParseUtils:
             self.x_axis = self.df.columns[0]
             self.y_axes = self.df.columns[1:]
 
+        self.df.drop(
+            columns=self.df.columns.difference(self.y_axes + [self.x_axis]),
+            inplace=True,
+        )
+        self.analytics = self.get_analytics()
         self.df.dropna(inplace=True)
+        self.df.drop_duplicates(inplace=True)
+
+    def get_analytics(self):
+        result = [
+            {
+                "name": "Total",
+                "invalids": int(self.df.isna().sum().sum()),
+                "rows": len(self.df),
+                "duplicates": int(self.df.duplicated().sum()),
+            }
+        ]
+        for column in self.df.columns:
+            column_analytics = {
+                "name": column,
+                "invalids": int(self.df[column].isna().sum()),
+                "unique": int(self.df[column].nunique()),
+            }
+            try:
+                column_analytics["min"] = self.df[column].min()
+                column_analytics["max"] = self.df[column].max()
+                column_analytics["mean"] = self.df[column].mean()
+                column_analytics["median"] = self.df[column].median()
+                column_analytics["std"] = self.df[column].std()
+                column_analytics["var"] = self.df[column].var()
+                column_analytics["skew"] = self.df[column].skew()
+                column_analytics["mode"] = self.df[column].mode().to_list()
+            except TypeError:
+                pass
+            result.append(column_analytics)
+        return result
 
     def get_parsed_data(self):
         if self.data_type == DataType.COMPARISION:
@@ -50,6 +88,7 @@ class ParseUtils:
                     for index, column in enumerate(self.y_axes)
                 ],
             },
+            "analytics": self.analytics,
         }
 
     def parse_data_for_comparision(self):
