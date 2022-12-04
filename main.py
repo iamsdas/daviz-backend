@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from utils import ParseUtils
+from utils.parse_utils import ParseUtils
 
 app = FastAPI()
 app.add_middleware(
