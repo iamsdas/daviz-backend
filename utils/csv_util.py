@@ -33,10 +33,12 @@ class CsvUtils:
             self.x_axis = self.df.columns[0]
             self.y_axes = self.df.columns[1:]
 
+        used_columns = [self.x_axis] + self.y_axes
+        if self.identifier:
+            used_columns.append(self.identifier)
+
         self.df.drop(
-            columns=self.df.columns.difference(
-                self.y_axes + [self.x_axis] + [self.identifier]
-            ),
+            columns=self.df.columns.difference(used_columns),
             inplace=True,
         )
         self.analytics = self.get_analytics()
