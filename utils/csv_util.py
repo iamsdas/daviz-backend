@@ -31,10 +31,10 @@ class CsvUtils:
             self.x_axis = self.df.columns[0]
             self.y_axes = self.df.columns[1:]
 
-        # self.df.drop(
-        #     columns=self.df.columns.difference(self.y_axes + [self.x_axis]),
-        #     inplace=True,
-        # )
+        self.df.drop(
+            columns=self.df.columns.difference(self.y_axes + [self.x_axis]),
+            inplace=True,
+        )
         self.analytics = self.get_analytics()
         self.df.dropna(inplace=True)
         self.df.drop_duplicates(inplace=True)
@@ -91,7 +91,7 @@ class CsvUtils:
             "data": {
                 "labels": list(labels),
                 "datasets": [
-                    {"data": list(self.df[column].values), "label": labels[index]}
+                    {"data": list(self.df[column].values), "label": column}
                     for index, column in enumerate(self.y_axes)
                 ],
             },
