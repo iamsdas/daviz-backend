@@ -1,7 +1,8 @@
 from io import StringIO
 
-from pandas import read_csv
+import numpy as np
 from fastapi import HTTPException, UploadFile
+from pandas import read_csv
 
 from utils.models import DataType
 
@@ -62,8 +63,12 @@ class CsvUtils:
                 column_analytics["var"] = self.df[column].var()
                 column_analytics["skew"] = self.df[column].skew()
                 column_analytics["mode"] = self.df[column].mode().to_list()
+                column_analytics["kurtosis"] = self.df[column].kurtosis()
             except TypeError:
                 pass
+            for key, value in column_analytics.items():
+                if isinstance(value, np.generic):
+                    column_analytics[key] = value.item()
             result.append(column_analytics)
         return result
 
