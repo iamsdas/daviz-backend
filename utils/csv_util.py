@@ -14,12 +14,14 @@ class CsvUtils:
         csv_file: UploadFile,
         x_axis: str | None = None,
         y_axes: str | None = None,
+        identifier: str | None = None,
     ):
         self.x_axis = x_axis
         self.y_axes = (
             [y_axis.strip() for y_axis in y_axes.split(",")] if y_axes else None
         )
         self.data_type = data_type
+        self.identifier = identifier
         self.load_data(csv_file)
 
     def load_data(self, csv_file: UploadFile):
@@ -32,7 +34,9 @@ class CsvUtils:
             self.y_axes = self.df.columns[1:]
 
         self.df.drop(
-            columns=self.df.columns.difference(self.y_axes + [self.x_axis]),
+            columns=self.df.columns.difference(
+                self.y_axes + [self.x_axis] + [self.identifier]
+            ),
             inplace=True,
         )
         self.analytics = self.get_analytics()
@@ -93,6 +97,19 @@ class CsvUtils:
                 "datasets": [
                     {"data": list(self.df[column].values), "label": column}
                     for index, column in enumerate(self.y_axes)
+                ]
+                if not self.identifier
+                else [
+                    {
+                        "data": list(
+                            self.df[self.df[self.identifier] == identifier][
+                                column
+                            ].values
+                        ),
+                        "label": identifier,
+                    }
+                    for column in enumerate(self.y_axes)
+                    for identifier in self.df[self.identifier].unique()
                 ],
             },
             "analytics": self.analytics,
