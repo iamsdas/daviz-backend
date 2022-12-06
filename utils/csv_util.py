@@ -87,7 +87,7 @@ class CsvUtils:
             raise HTTPException(status_code=404, detail="Invalid data type")
 
     def get_json_data(self):
-        labels = self.df[self.x_axis].values
+        labels = self.df[self.x_axis].unique().tolist()
 
         return {
             "data": {
