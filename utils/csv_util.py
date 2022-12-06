@@ -37,10 +37,6 @@ class CsvUtils:
         if self.identifier:
             used_columns.append(self.identifier)
 
-        self.df.drop(
-            columns=self.df.columns.difference(used_columns),
-            inplace=True,
-        )
         self.analytics = self.get_analytics()
         self.df.dropna(inplace=True)
         self.df.drop_duplicates(inplace=True)
@@ -110,7 +106,7 @@ class CsvUtils:
                         ),
                         "label": identifier,
                     }
-                    for column in enumerate(self.y_axes)
+                    for index, column in enumerate(self.y_axes)
                     for identifier in self.df[self.identifier].unique()
                 ],
             },
@@ -128,4 +124,7 @@ class CsvUtils:
         return self.get_json_data()
 
     def parse_data_for_trends(self):
+        self.df.sort_values(by=self.x_axis, inplace=True)
+        if self.identifier:
+            self.df.sort_values(by=self.identifier, inplace=True)
         return self.get_json_data()
