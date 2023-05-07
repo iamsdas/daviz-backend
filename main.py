@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from time_series import TimeSeriesGenerator
+from utils.time_series import TimeSeriesGenerator
 from utils.models import DataType, TimeSeriesInput
 from utils.csv_util import CsvUtils
 
