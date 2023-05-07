@@ -36,13 +36,13 @@ class TimeSeriesGenerator:
         x, y = self.train_series_split(self.series)
         batch_size = len(self.series) // 50 if len(self.series) > 50 else 1
         print("Batch size:", batch_size)
-        self.model.fit(x, y, epochs=20, batch_size=batch_size, verbose=True)
+        self.model.fit(x, y, epochs=20, batch_size=batch_size, verbose=False)
         print("Model trained.")
 
     def predict(self):
         x_test = np.array(self.series[-self.steps :])
         predictions = []
-        for i in range(self.steps):
+        for i in range(min(40, self.steps)):
             pred = self.model.predict(x_test.reshape(1, self.steps, 1))
             predictions.append(pred[0][0])
             x_test = np.append(x_test[1:], pred[0])
