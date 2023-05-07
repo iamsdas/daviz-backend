@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from utils.models import DataType
+from time_series import TimeSeriesGenerator
+from utils.models import DataType, TimeSeriesInput
 from utils.csv_util import CsvUtils
 
 app = FastAPI()
@@ -23,3 +24,9 @@ def get_config(
     identifier: str | None = Form(default=None),
 ):
     return CsvUtils(data_type, csv_file, x_axis, y_axes, identifier).get_parsed_data()
+
+
+@app.post("/api/predict")
+def get_prediction(data: TimeSeriesInput):
+    time_series = TimeSeriesGenerator(data.series)
+    return time_series.predict().tolist()
